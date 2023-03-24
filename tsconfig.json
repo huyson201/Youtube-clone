@@ -18,10 +18,12 @@
     "baseUrl": "./",
     "paths": {
       "@components/*": ["src/components/*"],
+      "~types/*": ["src/types/*"],
       "@pages/*": ["src/pages/*"],
-      "@assets/*": ["src/assets/*"]
+      "@assets/*": ["src/assets/*"],
+      "@services/*": ["src/services/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "@types"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
