@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { MouseEvent, useState } from 'react'
 import { HiBars3 } from 'react-icons/hi2'
 import { RiVideoAddLine } from 'react-icons/ri'
 import { IoIosSearch, IoMdNotificationsOutline } from 'react-icons/io'
@@ -7,9 +7,11 @@ import NavButton from './NavButton'
 import Logo from '../Logo/Logo'
 import SearchBox from '../SearchBox/SearchBox'
 import { Link } from 'react-router-dom'
-interface Props { }
+interface Props {
+    onShowLeftNav?: () => void
+}
 
-const Navbar = (props: Props) => {
+const Navbar = ({ onShowLeftNav }: Props) => {
     const [activeSearch, setActiveSearch] = useState<boolean>(false)
     const handleOpenSearch = () => {
         setActiveSearch(true)
@@ -19,11 +21,16 @@ const Navbar = (props: Props) => {
         setActiveSearch(false)
     }
 
+    const handleShowLeftNav = (event: MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation()
+        if (onShowLeftNav) onShowLeftNav()
+    }
+
     return (
         <div>
-            <div className='flex items-center   gap-4 top-0 left-0 bg-white z-[2] fixed w-full h-[var(--navbar-height)] justify-between px-4 py-2 shadow'>
+            <div className='flex items-center   gap-4 top-0 left-0 bg-white z-[1] fixed w-full h-[var(--navbar-height)] justify-between px-4 py-2 shadow'>
                 <div className='flex items-center'>
-                    <NavButton icons={<HiBars3 />} />
+                    <NavButton icons={<HiBars3 />} onClick={handleShowLeftNav} />
                     <Logo />
                 </div>
                 <SearchBox active={activeSearch} onClose={handleCloseSearch} />

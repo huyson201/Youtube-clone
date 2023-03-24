@@ -24,7 +24,7 @@ export interface LeftSideItemsProps {
 
 export const SidebarOptions = ({ icon, title }: LeftSideItemsProps) => {
     return (
-        <Link to={"#"} className='gap-2 text-center flex items-center justify-center py-2 w-full hover:bg-light-gray rounded-md flex-col text-xs'>
+        <Link to={"#"} className='gap-2 text-center flex items-center justify-center py-2 w-full hover:bg-[#f2f2f2] rounded-md flex-col text-[10px]'>
             <span className='text-xl'>{icon}</span>
             {title}
         </Link>
