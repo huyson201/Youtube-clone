@@ -1,0 +1,4 @@
+.left-side{
+    height: calc(100% - var(--navbar-height));
+    @apply fixed left-0 top-[var(--navbar-height)];
+}
