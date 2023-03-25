@@ -24,3 +24,8 @@
         -webkit-line-clamp: 2;
     }
 }
+
+
+.comment-content a{
+    @apply text-[#0000FF]
+}

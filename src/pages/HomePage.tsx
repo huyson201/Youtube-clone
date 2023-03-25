@@ -31,7 +31,9 @@ function HomePage({ }: Props) {
             const { scrollHeight, clientHeight, scrollTop } = scrollEl
             if (!fetching && scrollHeight - scrollTop <= clientHeight * 1.2) {
                 fetching = true
-                await popularVideoQuery.fetchNextPage()
+                if (popularVideoQuery.hasNextPage) {
+                    await popularVideoQuery.fetchNextPage()
+                }
                 fetching = false
             }
         }
@@ -63,14 +65,15 @@ function HomePage({ }: Props) {
                 </div>
             }
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 mt-6 gap-x-4 gap-y-8">
-                <VideoCard />
-                <VideoCard />
-                <VideoCard />
-                <VideoCard />
-                <VideoCard />
-                <VideoCard />
-                <VideoCard />
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 mt-6 gap-x-4 gap-y-8 pb-8">
+                {
+                    popularVideoQuery.data && popularVideoQuery.data.pages.map((page) => {
+                        return page.data.items.map(item => {
+                            return <VideoCard data={item} key={item.id} />
+                        })
+                    })
+                }
+
             </div>
         </Wrapper>
     )

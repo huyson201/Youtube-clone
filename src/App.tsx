@@ -1,12 +1,10 @@
 
 import { Outlet } from 'react-router-dom'
 import Navbar from './components/Navbar/Navbar'
-import LeftSide from './components/LeftSide/LeftSide'
 import LeftNav from '@components/LeftNav/LeftNav'
 import { useEffect, useState } from 'react'
-import axiosInstance from './services/axiosInstance'
-import youtubeApis from './services/youtubeApis'
 
+import 'intersection-observer';
 function App() {
   const [showLeftNav, setShowLeftNav] = useState<boolean>(false)
   const handleCloseLeftNav = () => {

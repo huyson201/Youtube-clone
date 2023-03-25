@@ -21,6 +21,7 @@
       "~types/*": ["src/types/*"],
       "@pages/*": ["src/pages/*"],
       "@assets/*": ["src/assets/*"],
+      "@utils/*": ["src/utils/*"],
       "@services/*": ["src/services/*"]
     }
   },

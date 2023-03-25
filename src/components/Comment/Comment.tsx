@@ -1,39 +1,80 @@
-import React from 'react'
+import React, { useCallback, useRef } from 'react'
 import avatar from '@assets/images/avatar.jpg'
+import { CommentThreads } from '~types/Comment'
+import numberWithCommas from '@utils/numberCommas'
+import timeSince from '@utils/timeSince'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import youtubeApis from '@services/youtubeApis'
 
-type Props = {}
 
-const Comment = (props: Props) => {
+type Props = {
+    total?: string,
+    videoId: string
+}
+
+const Comment = ({ total, videoId }: Props) => {
+    const commentsQuery = useInfiniteQuery({
+        queryKey: ["comments", videoId],
+        queryFn: ({ pageParam }) => youtubeApis.getParentComments({ videoId, pageToken: pageParam }),
+        getNextPageParam: data => {
+            return data.data.nextPageToken || undefined
+        }
+    })
+
+    const observer = useRef<IntersectionObserver>()
+    const lastCommentRef = useCallback<(node: HTMLDivElement) => void>(node => {
+        if (commentsQuery.isLoading) return
+        if (observer.current) observer.current.disconnect()
+
+        observer.current = new IntersectionObserver(comments => {
+            if (comments[0] && comments[0].isIntersecting && commentsQuery.hasNextPage) {
+                commentsQuery.fetchNextPage()
+            }
+        })
+        if (node) {
+            observer.current.observe(node)
+        }
+    }, [commentsQuery.data])
     return (
         <div className='mt-8 pb-8'>
-            <div className=''>616 Bình luận</div>
+            <div className=''>{numberWithCommas(total || "")} Bình luận</div>
             <div className='mt-4 space-y-6'>
                 <CommentForm />
-                <CommentItem />
-                <CommentItem />
-                <CommentItem />
-                <CommentItem />
+                {
+                    commentsQuery.data && commentsQuery.data.pages.map((page, pageIndex) => {
 
+                        return page.data.items.map((comment, index) => {
+                            if (pageIndex === commentsQuery.data.pages.length - 1 && index === page.data.items.length - 1) {
+                                return <CommentItem ref={lastCommentRef} key={comment.id} data={comment} />
+                            }
+                            return <CommentItem key={comment.id} data={comment} />
+                        })
+                    })
+                }
             </div>
         </div>
     )
 }
+export interface CommentItemProps {
+    data: CommentThreads
+}
 
-const CommentItem = () => {
+const CommentItem = React.forwardRef<HTMLDivElement, CommentItemProps>(({ data }, ref) => {
     return (
-        <div className='flex gap-4'>
+        <div ref={ref} className='flex gap-4'>
             <div className='w-10  h-10'>
-                <img src={avatar} className='rounded-full w-full h-full object-cover' alt="avatar" />
+                <img src={data?.snippet.topLevelComment.snippet.authorProfileImageUrl}
+                    className='rounded-full w-full h-full object-cover' alt={data?.snippet.topLevelComment.snippet.authorDisplayName} />
             </div>
             <div className='flex-1'>
-                <div><span className='text-sm font-bold'>Tanush Sathiyaseelan</span> <span className='text-xs text-text-secondary'> 1 năm trước</span></div>
-                <p className='text-sm'>
-                    To all the beginners. This video is great for you to practice however most of the things like the videos in the homepage and their details and when u play a video most of the details actually come from the database. So don't get confused. For every video there isn't many HTML pages. They trigger events and data comes from databases.
+                <div><span className='text-sm font-bold'>{data?.snippet.topLevelComment.snippet.authorDisplayName}</span> <span className='text-xs text-text-secondary'> {timeSince(new Date(data?.snippet.topLevelComment.snippet.updatedAt))}</span></div>
+                <p className='text-sm comment-content' dangerouslySetInnerHTML={{ __html: data?.snippet.topLevelComment.snippet.textDisplay }}>
                 </p>
             </div>
         </div>
     )
-}
+})
+
 
 const CommentForm = () => {
     return (
