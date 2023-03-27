@@ -1,4 +1,4 @@
-export interface Comment {
+interface Comment {
     kind: string,
     etag: string,
     id: string,
@@ -23,7 +23,7 @@ export interface Comment {
     }
 }
 
-export interface CommentThreads {
+interface CommentThreads {
 
     kind: string,
     etag: string,

@@ -2,22 +2,21 @@ import React from 'react'
 import avatar from '@assets/images/avatar.jpg'
 import thumb from '@assets/images/thumb.webp'
 import { Link } from 'react-router-dom'
-import { Video } from '~types/Video'
 import { useQuery } from '@tanstack/react-query'
 import youtubeApis from '@services/youtubeApis'
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import formatNumber from '@utils/formatNumber'
+
 interface Props {
     data: Video
 }
-
-export default function VideoCard({ data }: Props) {
+const VideoCard = React.forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
     const channelQuery = useQuery({
         queryKey: ["channel", data.snippet.channelId],
         queryFn: () => youtubeApis.getChannel(data.snippet.channelId)
     })
     return (
-        <div className='max-w-[360px] w-full  mx-auto sm:w-auto'>
+        <div ref={ref} className='max-w-[360px] w-full  mx-auto sm:w-auto'>
             <Link to={`/watch?v=${data.id}`} className='w-full h-full'>
                 <div className='w-full aspect-video '>
                     <LazyLoadImage wrapperClassName=' w-full h-full' className='w-full h-full rounded-lg object-cover' effect='black-and-white' loading='lazy' src={data?.snippet.thumbnails.high.url || ""} alt={data.snippet.title} />
@@ -44,4 +43,6 @@ export default function VideoCard({ data }: Props) {
             </div>
         </div>
     )
-}
+})
+
+export default VideoCard

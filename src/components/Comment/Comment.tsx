@@ -1,6 +1,5 @@
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import avatar from '@assets/images/avatar.jpg'
-import { CommentThreads } from '~types/Comment'
 import numberWithCommas from '@utils/numberCommas'
 import timeSince from '@utils/timeSince'
 import { useInfiniteQuery } from '@tanstack/react-query'
@@ -18,15 +17,17 @@ const Comment = ({ total, videoId }: Props) => {
         queryFn: ({ pageParam }) => youtubeApis.getParentComments({ videoId, pageToken: pageParam }),
         getNextPageParam: data => {
             return data.data.nextPageToken || undefined
-        }
+        },
     })
 
     const observer = useRef<IntersectionObserver>()
     const lastCommentRef = useCallback<(node: HTMLDivElement) => void>(node => {
+
         if (commentsQuery.isLoading) return
         if (observer.current) observer.current.disconnect()
-
         observer.current = new IntersectionObserver(comments => {
+
+
             if (comments[0] && comments[0].isIntersecting && commentsQuery.hasNextPage) {
                 commentsQuery.fetchNextPage()
             }
@@ -35,6 +36,9 @@ const Comment = ({ total, videoId }: Props) => {
             observer.current.observe(node)
         }
     }, [commentsQuery.data])
+
+
+
     return (
         <div className='mt-8 pb-8'>
             <div className=''>{numberWithCommas(total || "")} Bình luận</div>

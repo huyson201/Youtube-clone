@@ -18,13 +18,13 @@
     "baseUrl": "./",
     "paths": {
       "@components/*": ["src/components/*"],
-      "~types/*": ["src/types/*"],
       "@pages/*": ["src/pages/*"],
+      "@contexts/*": ["src/context/*"],
       "@assets/*": ["src/assets/*"],
       "@utils/*": ["src/utils/*"],
       "@services/*": ["src/services/*"]
     }
   },
-  "include": ["src", "@types"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }],
 }

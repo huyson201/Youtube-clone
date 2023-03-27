@@ -1,4 +1,4 @@
-export interface Video {
+interface Video {
   kind: string,
   etag: string,
   id: string,

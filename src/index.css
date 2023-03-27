@@ -29,3 +29,11 @@
 .comment-content a{
     @apply text-[#0000FF]
 }
+
+.gradient-left{
+    background: linear-gradient(to right, #fff 70%, transparent);
+}
+
+.gradient-right{
+    background: linear-gradient(to left, #fff 70%, transparent);
+}

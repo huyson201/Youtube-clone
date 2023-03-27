@@ -1,5 +1,5 @@
 
-export interface Chip {
+interface Chip {
     kind: string
     etag: string
     id: string
@@ -12,7 +12,7 @@ export interface Chip {
 }
 
 
-export interface ChipResults {
+interface ChipResults {
     kind: string
     etag: string
     items: Chip[]

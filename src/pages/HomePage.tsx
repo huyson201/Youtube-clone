@@ -3,14 +3,19 @@ import VideoCard from '@components/VideoCard/VideoCard'
 import Wrapper from '@components/Wrapper/Wrapper'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import classNames from 'classnames'
-import React, { useEffect, useState } from 'react'
+import React, { MouseEvent, useCallback, useEffect, useState } from 'react'
 import youtubeApis from '@services/youtubeApis'
+import CardVideoSkeleton from '@components/CardVideoSkeleton/CardVideoSkeleton'
+import ChipSkeleton from '@components/ChipSkeleton/ChipSkeleton'
+import RotatingLoader from '@components/RotatingLoader/RotatingLoader'
+import ChipBars from '@components/Chipbars/ChipBars'
 
 type Props = {}
 
 function HomePage({ }: Props) {
     const [currentCate, setCurrentCate] = useState<number>(0)
 
+    const [isDrag, setIsDrag] = useState<boolean>(false)
     const chipsQuery = useQuery({
         queryKey: ["chips"],
         queryFn: () => youtubeApis.getChips()
@@ -24,56 +29,54 @@ function HomePage({ }: Props) {
         }
     })
 
-    useEffect(() => {
-        let fetching = false
-        const handleScrollBottom = async (event: any) => {
-            let scrollEl = event.target.scrollingElement as HTMLElement
-            const { scrollHeight, clientHeight, scrollTop } = scrollEl
-            if (!fetching && scrollHeight - scrollTop <= clientHeight * 1.2) {
-                fetching = true
-                if (popularVideoQuery.hasNextPage) {
-                    await popularVideoQuery.fetchNextPage()
-                }
-                fetching = false
-            }
-        }
-        window.addEventListener("scroll", handleScrollBottom)
+    const observer = React.useRef<IntersectionObserver>()
+    const lastVideoCard = useCallback<(node: HTMLDivElement) => void>((node) => {
 
-        return () => window.removeEventListener("scroll", handleScrollBottom)
-    }, [])
+        if (popularVideoQuery.isLoading) return
+        if (observer.current) observer.current.disconnect()
+
+        observer.current = new IntersectionObserver(videoCard => {
+            if (videoCard[0] && videoCard[0].isIntersecting && popularVideoQuery.hasNextPage) {
+                popularVideoQuery.fetchNextPage()
+            }
+        })
+
+        if (node) {
+            observer.current.observe(node)
+        }
+    }, [popularVideoQuery.data])
+
+
+    const handleMouseMove = (event: MouseEvent<HTMLDivElement>) => {
+        console.log(isDrag)
+        if (!isDrag) return
+        event.currentTarget.scrollLeft -= event.movementX
+
+    }
     return (
         <Wrapper>
             <LeftSide />
-
-            {
-                chipsQuery.data && <div className="w-full chip-bar gap-3 flex-wrap sticky top-[var(--chipBar-top-pos)] bg-white items-center flex py-4">
-                    <span onClick={() => setCurrentCate(0)} className={classNames(`py-1 [&.active]:bg-black [&.active]:text-white cursor-pointer whitespace-nowrap 
-                                 text-sm px-2 font-roboto rounded-md bg-[rgba(0,0,0,0.05)]`, { active: currentCate === 0 })}>
-                        Tất cả
-                    </span>
-                    {
-                        chipsQuery.data.data.items.slice(0, 8).map((value, index) => {
-                            return (
-                                <span onClick={() => setCurrentCate((+value.id))} key={value.id} className={classNames(`py-1 [&.active]:bg-black [&.active]:text-white cursor-pointer whitespace-nowrap 
-                                 text-sm px-2 font-roboto rounded-md bg-[rgba(0,0,0,0.05)]`, { active: currentCate === +value.id })}>
-                                    {value.snippet.title}
-                                </span>
-                            )
-                        })
-                    }
-
-                </div>
-            }
-
+            <ChipBars onSelect={(data) => setCurrentCate(data)} />
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 mt-6 gap-x-4 gap-y-8 pb-8">
                 {
-                    popularVideoQuery.data && popularVideoQuery.data.pages.map((page) => {
-                        return page.data.items.map(item => {
+                    popularVideoQuery.isLoading && new Array(10).fill(0).map((_, index) => {
+                        return <CardVideoSkeleton key={index.toString()} />
+                    })
+                }
+                {
+                    popularVideoQuery.data && popularVideoQuery.data.pages.map((page, pageIndex) => {
+                        return page.data.items.map((item, itemIndex) => {
+                            if (popularVideoQuery.data.pages.length - 1 === pageIndex && page.data.items.length - 1 === itemIndex) {
+                                return <VideoCard ref={lastVideoCard} data={item} key={item.id} />
+                            }
                             return <VideoCard data={item} key={item.id} />
                         })
                     })
                 }
+                {
 
+                    popularVideoQuery.isFetchingNextPage && <RotatingLoader />
+                }
             </div>
         </Wrapper>
     )

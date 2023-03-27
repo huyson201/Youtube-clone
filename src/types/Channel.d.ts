@@ -1,4 +1,4 @@
-export interface Channel {
+interface Channel {
     kind: string,
     etag: string,
     id: string,

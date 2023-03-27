@@ -1,4 +1,4 @@
-export interface Activity {
+interface Activity {
     kind: string,
     etag: string,
     id: string,

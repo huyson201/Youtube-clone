@@ -1,4 +1,4 @@
-export interface PaginationResult<T> {
+interface PaginationResult<T> {
   kind: string,
   etag: string,
   nextPageToken: string,

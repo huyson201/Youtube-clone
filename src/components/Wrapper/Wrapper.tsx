@@ -6,7 +6,7 @@ interface Props {
 
 const Wrapper = (props: Props) => {
     return (
-        <div className='mt-[var(--navbar-height)] md:ml-[var(--leftSide-width)] px-4'>
+        <div className='relative mt-[var(--navbar-height)] md:ml-[var(--leftSide-width)] px-4'>
             {props.children}
         </div>
     )

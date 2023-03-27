@@ -1,11 +1,4 @@
-import { ChipResults } from "~types/Chip";
 import axiosInstance from "./axiosInstance"
-import { PaginationResult } from "~types/Common";
-import { Video } from "~types/Video";
-import { Channel } from "~types/Channel";
-import { Search } from "~types/Search";
-import { Activity } from "~types/Activity";
-import { CommentThreads } from "~types/Comment";
 
 const youtubeApis = {
     getPopular: ({ pageToken, cateId }: { pageToken?: string, cateId?: number }) => {
@@ -56,12 +49,11 @@ const youtubeApis = {
         })
     },
     getParentComments: ({ videoId, pageToken, order }: { videoId: string, pageToken?: string, order?: "time" | "relevance" }) => {
-        // https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId={V,IDEO_ID}&maxResults=100&key={YOUR_API_KEY}
         return axiosInstance.get<PaginationResult<CommentThreads>>("commentThreads", {
             params: {
                 part: "snippet,replies,id",
                 videoId: videoId,
-                maxResults: 20,
+                maxResults: 10,
                 pageToken: pageToken || "",
                 order: order || "relevance"
             }
