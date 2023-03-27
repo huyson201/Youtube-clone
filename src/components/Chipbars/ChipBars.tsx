@@ -15,6 +15,8 @@ function ChipBars({ onSelect }: Props) {
         queryFn: () => youtubeApis.getChips()
     })
     const [isDragging, setIsDragging] = useState(false);
+    const [hasDragging, setHasDragging] = useState(false);
+
     const [hiddenLeft, setHiddenLeft] = useState(true);
     const [hiddenRight, setHiddenRight] = useState(false);
 
@@ -28,10 +30,13 @@ function ChipBars({ onSelect }: Props) {
         setIsDragging(true);
         setPrevPageX(e.pageX || e.touches[0].pageX)
         setPrevScrollLeft(chipBox.current?.scrollLeft || 0)
+        setHasDragging(false)
     };
 
     const handleMouseUp = (e: any) => {
-        setIsDragging(false);
+        setTimeout(() => {
+            setIsDragging(false);
+        }, 10);
     };
 
     const [currentCate, setCurrentCate] = useState<number>(0)
@@ -41,6 +46,7 @@ function ChipBars({ onSelect }: Props) {
         let posDiff = (event.pageX || event.touches[0].pageX) - prevPageX
         event.currentTarget.scrollLeft = prevScrollLeft - posDiff
         handleHiddenLeftRight()
+        setHasDragging(true)
     }
 
     const handleHiddenLeftRight = () => {
@@ -91,7 +97,7 @@ function ChipBars({ onSelect }: Props) {
                         onTouchEnd={handleMouseUp}
                         onTouchMove={handleMouseMove}
                         ref={chipBox}
-                        className={classNames("tab-box overflow-x-hidden chip-bar gap-3 items-center flex py-4", { "scroll-smooth": !isDragging })}>
+                        className={classNames("cursor-grab tab-box overflow-x-hidden chip-bar gap-3 items-center flex py-4", { "scroll-smooth": !isDragging })}>
 
 
                         <span onClick={() => { if (!isDragging) onSelect && onSelect(0); setCurrentCate(0) }} className={classNames(`py-1 [&.active]:bg-black [&.active]:text-white cursor-pointer whitespace-nowrap 
@@ -102,17 +108,14 @@ function ChipBars({ onSelect }: Props) {
                         {
                             chipsQuery.data.data.items.slice(0, 15).map((value, index) => {
                                 const handleSelect = (e: MouseEvent<HTMLSpanElement>) => {
-                                    if (!isDragging) {
+                                    if (!hasDragging) {
                                         onSelect && onSelect(+value.id);
                                         setCurrentCate((+value.id))
-                                    } else {
-                                        e.preventDefault();
-                                        e.stopPropagation()
                                     }
                                 }
                                 return (
                                     <span onClick={handleSelect} key={value.id} className={classNames(`py-1 [&.active]:bg-black [&.active]:text-white cursor-pointer whitespace-nowrap 
-             text-sm px-2 font-roboto rounded-md transition duration-200 hover:bg-light-gray bg-[rgba(0,0,0,0.05)]`, { active: currentCate === +value.id })}>
+             text-sm px-2 font-roboto rounded-md transition select-none duration-200 hover:bg-light-gray bg-[rgba(0,0,0,0.05)]`, { active: currentCate === +value.id })}>
                                         {value.snippet.title}
                                     </span>
                                 )
