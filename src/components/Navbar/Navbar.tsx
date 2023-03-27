@@ -68,7 +68,7 @@ const Navbar = ({ onShowLeftNav }: Props) => {
 
     return (
         <div>
-            <div className='flex items-center   gap-4 top-0 left-0 bg-white z-[1] fixed w-full h-[var(--navbar-height)] justify-between px-4 py-2 shadow'>
+            <div className='flex items-center   gap-4 top-0 left-0 bg-white z-[2] fixed w-full h-[var(--navbar-height)] justify-between px-4 py-2 shadow'>
                 <div className='flex items-center'>
                     <NavButton icons={<HiBars3 />} onClick={handleShowLeftNav} />
                     <Logo />

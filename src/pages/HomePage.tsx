@@ -15,12 +15,6 @@ type Props = {}
 function HomePage({ }: Props) {
     const [currentCate, setCurrentCate] = useState<number>(0)
 
-    const [isDrag, setIsDrag] = useState<boolean>(false)
-    const chipsQuery = useQuery({
-        queryKey: ["chips"],
-        queryFn: () => youtubeApis.getChips()
-    })
-
     const popularVideoQuery = useInfiniteQuery({
         queryKey: ["popular", currentCate],
         queryFn: ({ pageParam }) => youtubeApis.getPopular({ pageToken: pageParam || "", cateId: currentCate }),
@@ -47,12 +41,7 @@ function HomePage({ }: Props) {
     }, [popularVideoQuery.data])
 
 
-    const handleMouseMove = (event: MouseEvent<HTMLDivElement>) => {
-        console.log(isDrag)
-        if (!isDrag) return
-        event.currentTarget.scrollLeft -= event.movementX
 
-    }
     return (
         <Wrapper>
             <LeftSide />

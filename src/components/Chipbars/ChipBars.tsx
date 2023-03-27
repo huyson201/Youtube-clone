@@ -18,21 +18,28 @@ function ChipBars({ onSelect }: Props) {
     const [hiddenLeft, setHiddenLeft] = useState(true);
     const [hiddenRight, setHiddenRight] = useState(false);
 
+    const [prevPageX, setPrevPageX] = useState<number>(0)
+    const [prevScrollLeft, setPrevScrollLeft] = useState<number>(0)
+
     const chipBox = React.useRef<HTMLDivElement>(null)
     const chipWrapper = React.useRef<HTMLDivElement>(null)
 
-    const handleMouseDown = () => {
+    const handleMouseDown = (e: any) => {
         setIsDragging(true);
+        setPrevPageX(e.pageX || e.touches[0].pageX)
+        setPrevScrollLeft(chipBox.current?.scrollLeft || 0)
     };
-    const handleMouseUp = () => {
+
+    const handleMouseUp = (e: any) => {
         setIsDragging(false);
     };
 
     const [currentCate, setCurrentCate] = useState<number>(0)
 
-    const handleMouseMove = (event: MouseEvent<HTMLDivElement>) => {
+    const handleMouseMove = (event: any) => {
         if (!isDragging) return
-        event.currentTarget.scrollLeft -= event.movementX
+        let posDiff = (event.pageX || event.touches[0].pageX) - prevPageX
+        event.currentTarget.scrollLeft = prevScrollLeft - posDiff
         handleHiddenLeftRight()
     }
 
@@ -80,19 +87,31 @@ function ChipBars({ onSelect }: Props) {
                     <div onMouseMove={handleMouseMove}
                         onMouseDown={handleMouseDown}
                         onMouseUp={handleMouseUp}
+                        onTouchStart={handleMouseDown}
+                        onTouchEnd={handleMouseUp}
+                        onTouchMove={handleMouseMove}
                         ref={chipBox}
                         className={classNames("tab-box overflow-x-hidden chip-bar gap-3 items-center flex py-4", { "scroll-smooth": !isDragging })}>
 
 
-                        <span onClick={() => { onSelect && onSelect(0); setCurrentCate(0) }} className={classNames(`py-1 [&.active]:bg-black [&.active]:text-white cursor-pointer whitespace-nowrap 
+                        <span onClick={() => { if (!isDragging) onSelect && onSelect(0); setCurrentCate(0) }} className={classNames(`py-1 [&.active]:bg-black [&.active]:text-white cursor-pointer whitespace-nowrap 
              text-sm px-2 font-roboto rounded-md transition duration-200 hover:bg-light-gray bg-[rgba(0,0,0,0.05)]`, { active: currentCate === 0 })}>
                             Tất cả
                         </span>
 
                         {
                             chipsQuery.data.data.items.slice(0, 15).map((value, index) => {
+                                const handleSelect = (e: MouseEvent<HTMLSpanElement>) => {
+                                    if (!isDragging) {
+                                        onSelect && onSelect(+value.id);
+                                        setCurrentCate((+value.id))
+                                    } else {
+                                        e.preventDefault();
+                                        e.stopPropagation()
+                                    }
+                                }
                                 return (
-                                    <span onClick={() => { onSelect && onSelect(+value.id); setCurrentCate((+value.id)) }} key={value.id} className={classNames(`py-1 [&.active]:bg-black [&.active]:text-white cursor-pointer whitespace-nowrap 
+                                    <span onClick={handleSelect} key={value.id} className={classNames(`py-1 [&.active]:bg-black [&.active]:text-white cursor-pointer whitespace-nowrap 
              text-sm px-2 font-roboto rounded-md transition duration-200 hover:bg-light-gray bg-[rgba(0,0,0,0.05)]`, { active: currentCate === +value.id })}>
                                         {value.snippet.title}
                                     </span>
